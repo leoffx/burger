@@ -1,5 +1,6 @@
 {
   "name": "burger",
+  "homepage": "https://leoffx.github.io/burger/",
   "private": true,
   "type": "module",
   "scripts": {
