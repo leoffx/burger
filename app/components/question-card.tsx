@@ -1,7 +1,6 @@
 import { CheckCircle2, HelpCircle, XCircle } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -42,10 +41,6 @@ export function QuestionCard({ question }: QuestionCardProps) {
 
   const isCorrect = selected === question.solution;
 
-  const handleCheck = () => {
-    setShowSolution(true);
-  };
-
   return (
     <Card className="w-full mb-6">
       <CardHeader>
@@ -73,7 +68,12 @@ export function QuestionCard({ question }: QuestionCardProps) {
       <CardContent>
         <RadioGroup
           value={selected || ""}
-          onValueChange={(v) => !showSolution && setSelected(v)}
+          onValueChange={(v) => {
+            if (!showSolution) {
+              setSelected(v);
+              setShowSolution(true);
+            }
+          }}
           className="space-y-3"
         >
           {(["a", "b", "c", "d"] as const).map((key) => {
@@ -101,7 +101,12 @@ export function QuestionCard({ question }: QuestionCardProps) {
               <div
                 key={key}
                 className={itemClass}
-                onClick={() => !showSolution && setSelected(key)}
+                onClick={() => {
+                  if (!showSolution) {
+                    setSelected(key);
+                    setShowSolution(true);
+                  }
+                }}
               >
                 <RadioGroupItem
                   value={key}
@@ -136,11 +141,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
         )}
       </CardContent>
       <CardFooter>
-        {!showSolution ? (
-          <Button onClick={handleCheck} disabled={!selected} className="w-full">
-            Check Answer
-          </Button>
-        ) : (
+        {showSolution && (
           <div className="w-full text-center font-medium">
             {isCorrect ? (
               <span className="text-green-600">Correct!</span>
