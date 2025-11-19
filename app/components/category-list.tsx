@@ -5,14 +5,47 @@ import {
   CATEGORY_EMOJIS,
   getGeneralCategories,
   getQuestionsByCategory,
+  questions,
   STATES,
 } from "~/lib/questions";
+import { useStudy } from "~/lib/store";
 
 export function CategoryList() {
+  const { answers } = useStudy();
   const categories = getGeneralCategories();
+
+  const totalQuestions = questions.length;
+  const totalAnswered = questions.filter((q) => answers[q.num]).length;
+  const totalPercentage =
+    totalQuestions > 0 ? Math.round((totalAnswered / totalQuestions) * 100) : 0;
 
   return (
     <div className="container mx-auto p-4 max-w-5xl space-y-12 py-8">
+      {/* Overall Progress */}
+      <section>
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex justify-between items-center">
+              <span></span>
+              <span className="text-2xl font-bold text-primary">
+                {totalPercentage}%
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full bg-background h-4 rounded-full overflow-hidden border">
+              <div
+                className="bg-green-600 h-full transition-all duration-500"
+                style={{ width: `${totalPercentage}%` }}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-2 text-right">
+              {totalAnswered} of {totalQuestions} questions answered
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+
       {/* General Categories Section */}
       <section>
         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -20,7 +53,13 @@ export function CategoryList() {
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {categories.map((cat) => {
-            const count = getQuestionsByCategory(cat).length;
+            const catQuestions = getQuestionsByCategory(cat);
+            const count = catQuestions.length;
+            const answeredCount = catQuestions.filter(
+              (q) => answers[q.num]
+            ).length;
+            const percentage =
+              count > 0 ? Math.round((answeredCount / count) * 100) : 0;
             const emoji = CATEGORY_EMOJIS[cat] || "📝";
 
             return (
@@ -33,7 +72,18 @@ export function CategoryList() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="secondary">{count} Questions</Badge>
+                    <div className="flex justify-between items-center mb-2">
+                      <Badge variant="secondary">{count} Questions</Badge>
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {percentage}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-green-600 h-full transition-all duration-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               </Link>
@@ -49,7 +99,14 @@ export function CategoryList() {
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {STATES.map((state) => {
-            // We use the state code as the category ID
+            const stateQuestions = getQuestionsByCategory(state.code);
+            const count = stateQuestions.length;
+            const answeredCount = stateQuestions.filter(
+              (q) => answers[q.num]
+            ).length;
+            const percentage =
+              count > 0 ? Math.round((answeredCount / count) * 100) : 0;
+
             return (
               <Link key={state.code} to={`/category/${state.code}`}>
                 <Card className="h-full hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all hover:scale-[1.02] cursor-pointer">
@@ -60,7 +117,18 @@ export function CategoryList() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Badge variant="outline">10 Questions</Badge>
+                    <div className="flex justify-between items-center mb-2">
+                      <Badge variant="outline">{count} Questions</Badge>
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {percentage}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-green-600 h-full transition-all duration-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               </Link>

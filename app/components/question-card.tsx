@@ -1,5 +1,4 @@
 import { CheckCircle2, HelpCircle, XCircle } from "lucide-react";
-import { useState } from "react";
 import { Badge } from "~/components/ui/badge";
 import {
   Card,
@@ -17,9 +16,10 @@ interface QuestionCardProps {
 }
 
 export function QuestionCard({ question }: QuestionCardProps) {
-  const { language } = useStudy();
-  const [selected, setSelected] = useState<string | null>(null);
-  const [showSolution, setShowSolution] = useState(false);
+  const { language, answers, setAnswer } = useStudy();
+
+  const selected = answers[question.num] || null;
+  const showSolution = !!selected;
 
   const t = question.translation?.[language] || {
     question: question.question,
@@ -69,16 +69,13 @@ export function QuestionCard({ question }: QuestionCardProps) {
         <RadioGroup
           value={selected || ""}
           onValueChange={(v) => {
-            if (!showSolution) {
-              setSelected(v);
-              setShowSolution(true);
-            }
+            setAnswer(question.num, v);
           }}
           className="space-y-3"
         >
           {(["a", "b", "c", "d"] as const).map((key) => {
             let itemClass =
-              "flex items-center space-x-2 p-3 rounded-lg border transition-colors";
+              "flex items-center space-x-2 p-3 rounded-lg border transition-colors cursor-pointer";
 
             if (showSolution) {
               if (key === question.solution) {
@@ -87,11 +84,10 @@ export function QuestionCard({ question }: QuestionCardProps) {
               } else if (selected === key && key !== question.solution) {
                 itemClass += " border-red-500 bg-red-50 dark:bg-red-900/20";
               } else {
-                itemClass += " opacity-50";
+                itemClass += " opacity-50 hover:opacity-100";
               }
             } else {
-              itemClass +=
-                " hover:bg-neutral-50 dark:hover:bg-neutral-800 cursor-pointer";
+              itemClass += " hover:bg-neutral-50 dark:hover:bg-neutral-800";
               if (selected === key) {
                 itemClass += " border-primary bg-primary/5";
               }
@@ -102,10 +98,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
                 key={key}
                 className={itemClass}
                 onClick={() => {
-                  if (!showSolution) {
-                    setSelected(key);
-                    setShowSolution(true);
-                  }
+                  setAnswer(question.num, key);
                 }}
               >
                 <RadioGroupItem

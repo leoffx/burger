@@ -132,3 +132,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+button, [type="button"] {
+  @apply cursor-pointer;
+}
