@@ -41,8 +41,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { StudyProvider } from "./lib/store";
+
 export default function App() {
-  return <Outlet />;
+  return (
+    <StudyProvider>
+      <Outlet />
+    </StudyProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
